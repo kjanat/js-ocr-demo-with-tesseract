@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- Preconnect to external origins -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="/" crossorigin>
+
+    <!-- Preload critical resources -->
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/pdfjs-dist@5/web/pdf_viewer.css" as="style" crossorigin="anonymous">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4/dist/index.global.js" as="script" crossorigin="anonymous">
+
+    <!-- Prefetch resources for future use -->
+    <link rel="prefetch" href="https://cdn.jsdelivr.net/npm/pdfjs-dist@5/build/pdf.min.mjs" crossorigin="anonymous">
+    <link rel="prefetch" href="https://cdn.jsdelivr.net/npm/tesseract.js@6/dist/worker.min.js" crossorigin="anonymous">
+    <link rel="prefetch" href="https://cdn.jsdelivr.net/npm/@scribe.js/tesseract.js@6/dist/tesseract.min.js" crossorigin="anonymous">
+    <link rel="prefetch" href="https://cdn.jsdelivr.net/npm/@scribe.js/tesseract.js@6/dist/worker.min.js" crossorigin="anonymous">
+    <link rel="prefetch" href="https://cdn.jsdelivr.net/npm/pdfjs-dist@5/build/pdf.worker.min.mjs" crossorigin="anonymous">
+    <link rel="prefetch" href="https://cdn.jsdelivr.net/npm/tesseract.js@6/dist/tesseract.min.js" crossorigin="anonymous">
+
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4/dist/index.global.js" crossorigin="anonymous"></script>
+    <script src="./js/main.js" type="module"></script>
+    <link href="https://cdn.jsdelivr.net/npm/pdfjs-dist@5/web/pdf_viewer.css" rel="stylesheet" crossorigin="anonymous">
+    <link href="./css/styles.css" rel="stylesheet">
+
+    <title>OCR With JS</title>
+    <meta name="description" content="OCR with JavaScript using Tesseract.js and PDF.js">
+</head>
+
+<body class="bg-gray-100 dark:bg-gray-900 dark:text-white h-screen flex items-center justify-center">
+    <button id="darkModeToggle" class="absolute top-4 right-4 bg-gray-200 dark:bg-gray-800 text-black dark:text-white cursor-pointer px-4 py-2 rounded">
+        Dark Mode
+    </button>
+    <div class="flex h-full w-full">
+        <!-- Left Column - PDF Viewer -->
+        <div class="w-1/2 p-4 flex-grow flex flex-col">
+            <!-- PDF Viewer Container -->
+            <div id="pdfViewer" class="border border-gray-300 dark:border-gray-700 flex-grow mb-4 flex items-center justify-center">
+                <canvas id="canvas" style="max-width: 100%; max-height: 100%;"></canvas>
+            </div>
+            <div class="flex mb-4 items-center space-x-4">
+                <button class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200 ease-in-out mr-2 w-full max-w-[120px]" id="prev">Previous</button>
+                <button class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-200 ease-in-out w-full max-w-[120px]" id="next">Next</button>
+                <span id="pagination" class="text-gray-600 dark:text-gray-400 ml-2 hidden">Page:&nbsp;<span id="page_num" class="font-semibold"></span>&nbsp;/&nbsp;<span id="page_count" class="font-semibold"></span></span>
+            </div>
+            <div class="mt-1 relative">
+                <input
+                       type="file"
+                       id="uploadPDF"
+                       name="uploadPDF"
+                       accept="application/pdf"
+                       class="hidden" />
+                <label
+                       for="uploadPDF"
+                       class="mt-1 p-2 border rounded-md dark:border-gray-700 dark:bg-gray-800 dark:text-white cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition duration-200 ease-in-out flex items-center justify-center">
+                    Choose a PDF file
+                </label>
+            </div>
+        </div>
+        <!-- Right Column - Textbox for Extracted Text -->
+        <div class="w-1/2 p-4 flex-grow">
+            <textarea class="w-full h-full border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white p-2" id="extracted-text" placeholder="Extracted Text"></textarea>
+        </div>
+    </div>
+
+    <script>
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        darkModeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@scribe.js/tesseract.js@6/dist/tesseract.min.js" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@5/build/pdf.min.mjs" type="module"></script>
+</body>
+
+</html>
