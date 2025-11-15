@@ -1,12 +1,26 @@
-import { initializeTheme, toggleTheme, DARK_THEME } from '../utils/themeUtils.js';
+// @ts-check
+import { DARK_THEME, initializeTheme, toggleTheme } from '../utils/themeUtils.js';
 
+/**
+ * Dark Mode Toggle component for managing theme switching
+ * @class
+ */
 class DarkModeToggle {
   constructor() {
-    this.button = document.getElementById('darkModeToggle');
+    /** @type {HTMLButtonElement | null} */
+    this.button = /** @type {HTMLButtonElement | null} */ (
+      document.getElementById('darkModeToggle')
+    );
     this.initialize();
   }
 
+  /**
+   * Initialize the dark mode toggle
+   * @returns {void}
+   */
   initialize() {
+    if (!this.button) return;
+
     // Initialize theme from localStorage
     const currentTheme = initializeTheme();
     this.updateButtonText(currentTheme);
@@ -18,7 +32,14 @@ class DarkModeToggle {
     });
   }
 
+  /**
+   * Update button text and icon based on theme
+   * @param {'dark' | 'light'} theme - Current theme
+   * @returns {void}
+   */
   updateButtonText(theme) {
+    if (!this.button) return;
+
     if (theme === DARK_THEME) {
       this.button.innerHTML = `
         <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

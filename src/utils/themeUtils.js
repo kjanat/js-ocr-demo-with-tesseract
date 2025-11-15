@@ -1,18 +1,31 @@
+// @ts-check
+
+/** @type {'theme'} */
 const THEME_KEY = 'theme';
+
+/** @type {'dark'} */
 const DARK_THEME = 'dark';
+
+/** @type {'light'} */
 const LIGHT_THEME = 'light';
 
 /**
+ * @typedef {'dark' | 'light'} Theme
+ */
+
+/**
  * Get saved theme from localStorage
- * @returns {string} - 'dark' or 'light'
+ * @returns {Theme} The saved theme ('dark' or 'light')
  */
 export function getSavedTheme() {
-  return localStorage.getItem(THEME_KEY) || LIGHT_THEME;
+  const theme = localStorage.getItem(THEME_KEY);
+  return /** @type {Theme} */ (theme || LIGHT_THEME);
 }
 
 /**
  * Save theme to localStorage
- * @param {string} theme - 'dark' or 'light'
+ * @param {Theme} theme - Theme to save ('dark' or 'light')
+ * @returns {void}
  */
 export function saveTheme(theme) {
   localStorage.setItem(THEME_KEY, theme);
@@ -20,7 +33,8 @@ export function saveTheme(theme) {
 
 /**
  * Apply theme to document
- * @param {string} theme - 'dark' or 'light'
+ * @param {Theme} theme - Theme to apply ('dark' or 'light')
+ * @returns {void}
  */
 export function applyTheme(theme) {
   if (theme === DARK_THEME) {
@@ -31,8 +45,8 @@ export function applyTheme(theme) {
 }
 
 /**
- * Toggle theme
- * @returns {string} - New theme
+ * Toggle between dark and light themes
+ * @returns {Theme} The new active theme
  */
 export function toggleTheme() {
   const currentTheme = getSavedTheme();
@@ -44,6 +58,7 @@ export function toggleTheme() {
 
 /**
  * Initialize theme on page load
+ * @returns {Theme} The initialized theme
  */
 export function initializeTheme() {
   const savedTheme = getSavedTheme();

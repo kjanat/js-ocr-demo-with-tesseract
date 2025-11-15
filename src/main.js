@@ -1,16 +1,31 @@
+// @ts-check
 import './styles.css';
+import DarkModeToggle from './components/darkModeToggle.js';
 import PDFViewer from './components/pdfViewer.js';
 import TextExtractor from './components/textExtractor.js';
-import DarkModeToggle from './components/darkModeToggle.js';
 
+/**
+ * Main application class that initializes and coordinates all components
+ * @class
+ */
 class App {
   constructor() {
+    /** @type {PDFViewer | null} */
     this.pdfViewer = null;
+
+    /** @type {TextExtractor | null} */
     this.textExtractor = null;
+
+    /** @type {DarkModeToggle | null} */
     this.darkModeToggle = null;
+
     this.initialize();
   }
 
+  /**
+   * Initialize the application
+   * @returns {void}
+   */
   initialize() {
     // Wait for DOM to be fully loaded
     if (document.readyState === 'loading') {
@@ -20,6 +35,10 @@ class App {
     }
   }
 
+  /**
+   * Set up the application by initializing all components
+   * @returns {void}
+   */
   setupApp() {
     console.log('Initializing OCR Application...');
 
@@ -35,7 +54,9 @@ class App {
 
     // Set callback to extract text when page is rendered
     this.pdfViewer.setOnPageRenderCallback(async () => {
-      await this.textExtractor.extractText();
+      if (this.textExtractor) {
+        await this.textExtractor.extractText();
+      }
     });
 
     console.log('Application initialized successfully!');

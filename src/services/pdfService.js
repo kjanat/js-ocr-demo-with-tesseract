@@ -1,4 +1,16 @@
+// @ts-check
 import * as pdfjsLib from 'pdfjs-dist';
+
+/**
+ * @typedef {import('pdfjs-dist').PDFDocumentProxy} PDFDocumentProxy
+ * @typedef {import('pdfjs-dist').PDFPageProxy} PDFPageProxy
+ */
+
+/**
+ * @typedef {Object} PageRenderResult
+ * @property {number} pageNum - The page number that was rendered
+ * @property {number} totalPages - Total number of pages in the document
+ */
 
 // Configure PDF.js worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
@@ -6,18 +18,30 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url
 ).toString();
 
+/**
+ * Service for handling PDF document operations including loading and rendering
+ * @class
+ */
 class PDFService {
   constructor() {
+    /** @type {PDFDocumentProxy | null} */
     this.pdfDoc = null;
+
+    /** @type {number} */
     this.currentPage = 1;
+
+    /** @type {boolean} */
     this.isRendering = false;
+
+    /** @type {number | null} */
     this.pendingPage = null;
   }
 
   /**
    * Load a PDF document from file data
-   * @param {string|ArrayBuffer} fileData - PDF file data
-   * @returns {Promise<void>}
+   * @param {string | ArrayBuffer | Uint8Array} fileData - PDF file data
+   * @returns {Promise<PDFDocumentProxy>} The loaded PDF document
+   * @throws {Error} If PDF fails to load
    */
   async loadPDF(fileData) {
     try {
@@ -34,10 +58,11 @@ class PDFService {
 
   /**
    * Render a specific page to a canvas
-   * @param {number} pageNum - Page number to render
+   * @param {number} pageNum - Page number to render (1-indexed)
    * @param {HTMLCanvasElement} canvas - Canvas element to render to
-   * @param {number} scale - Scale factor for rendering
-   * @returns {Promise<void>}
+   * @param {number} [scale=1.5] - Scale factor for rendering
+   * @returns {Promise<PageRenderResult | undefined>} Render result with page info
+   * @throws {Error} If no PDF is loaded or rendering fails
    */
   async renderPage(pageNum, canvas, scale = 1.5) {
     if (!this.pdfDoc) {
@@ -57,6 +82,10 @@ class PDFService {
       const viewport = page.getViewport({ scale });
 
       const context = canvas.getContext('2d');
+      if (!context) {
+        throw new Error('Failed to get canvas 2D context');
+      }
+
       canvas.height = viewport.height;
       canvas.width = viewport.width;
 
@@ -85,7 +114,7 @@ class PDFService {
 
   /**
    * Navigate to the next page
-   * @returns {number|null} - New page number or null if already at last page
+   * @returns {number | null} New page number or null if already at last page
    */
   nextPage() {
     if (!this.pdfDoc || this.currentPage >= this.pdfDoc.numPages) {
@@ -96,7 +125,7 @@ class PDFService {
 
   /**
    * Navigate to the previous page
-   * @returns {number|null} - New page number or null if already at first page
+   * @returns {number | null} New page number or null if already at first page
    */
   previousPage() {
     if (!this.pdfDoc || this.currentPage <= 1) {
@@ -107,22 +136,23 @@ class PDFService {
 
   /**
    * Get current page number
-   * @returns {number}
+   * @returns {number} Current page number (1-indexed)
    */
   getCurrentPage() {
     return this.currentPage;
   }
 
   /**
-   * Get total number of pages
-   * @returns {number}
+   * Get total number of pages in the document
+   * @returns {number} Total pages, or 0 if no document loaded
    */
   getTotalPages() {
     return this.pdfDoc ? this.pdfDoc.numPages : 0;
   }
 
   /**
-   * Reset the PDF service
+   * Reset the PDF service to initial state
+   * @returns {void}
    */
   reset() {
     this.pdfDoc = null;

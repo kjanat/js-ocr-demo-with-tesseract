@@ -1,16 +1,38 @@
+// @ts-check
 import { createWorker } from 'tesseract.js';
 
+/**
+ * @typedef {import('tesseract.js').Worker} TesseractWorker
+ * @typedef {import('tesseract.js').RecognizeResult} RecognizeResult
+ */
+
+/**
+ * @typedef {Object} LoggerMessage
+ * @property {string} status - Current status of the OCR operation
+ * @property {number} progress - Progress value between 0 and 1
+ */
+
+/**
+ * Service for handling OCR operations using Tesseract.js
+ * @class
+ */
 class OCRService {
   constructor() {
+    /** @type {TesseractWorker | null} */
     this.worker = null;
+
+    /** @type {boolean} */
     this.isProcessing = false;
+
+    /** @type {string} */
     this.language = 'eng';
   }
 
   /**
    * Initialize Tesseract worker
-   * @param {string} lang - Language code for OCR
+   * @param {string} [lang='eng'] - Language code for OCR (e.g., 'eng', 'spa', 'fra')
    * @returns {Promise<void>}
+   * @throws {Error} If worker initialization fails
    */
   async initialize(lang = 'eng') {
     if (this.worker) {
@@ -21,7 +43,7 @@ class OCRService {
       console.log('Initializing Tesseract worker...');
       this.language = lang;
       this.worker = await createWorker(lang, 1, {
-        logger: (m) => {
+        logger: (/** @type {LoggerMessage} */ m) => {
           if (m.status === 'recognizing text') {
             console.log(`OCR Progress: ${Math.round(m.progress * 100)}%`);
           }
@@ -36,12 +58,17 @@ class OCRService {
 
   /**
    * Recognize text from an image
-   * @param {HTMLCanvasElement|HTMLImageElement|string} image - Image source
-   * @returns {Promise<string>} - Extracted text
+   * @param {HTMLCanvasElement | HTMLImageElement | string} image - Image source
+   * @returns {Promise<string>} Extracted text from the image
+   * @throws {Error} If OCR is already processing or recognition fails
    */
   async recognize(image) {
     if (!this.worker) {
       await this.initialize();
+    }
+
+    if (!this.worker) {
+      throw new Error('OCR worker initialization failed');
     }
 
     if (this.isProcessing) {
@@ -52,7 +79,8 @@ class OCRService {
 
     try {
       console.log('Starting OCR recognition...');
-      const { data: { text } } = await this.worker.recognize(image);
+      const result = await this.worker.recognize(image);
+      const text = result.data.text;
       console.log('OCR recognition completed');
       this.isProcessing = false;
       return text;
@@ -65,8 +93,9 @@ class OCRService {
 
   /**
    * Recognize text from canvas element
-   * @param {HTMLCanvasElement} canvas - Canvas element
-   * @returns {Promise<string>} - Extracted text
+   * @param {HTMLCanvasElement} canvas - Canvas element containing the image
+   * @returns {Promise<string>} Extracted text from the canvas
+   * @throws {Error} If canvas is invalid or recognition fails
    */
   async recognizeFromCanvas(canvas) {
     const imageDataUrl = canvas.toDataURL('image/png');
@@ -76,8 +105,9 @@ class OCRService {
 
   /**
    * Load an image from a URL
-   * @param {string} url - Image URL
-   * @returns {Promise<HTMLImageElement>}
+   * @param {string} url - Image URL or data URL
+   * @returns {Promise<HTMLImageElement>} Loaded image element
+   * @throws {Error} If image fails to load
    */
   loadImage(url) {
     return new Promise((resolve, reject) => {
@@ -89,7 +119,7 @@ class OCRService {
   }
 
   /**
-   * Terminate the worker
+   * Terminate the worker and free resources
    * @returns {Promise<void>}
    */
   async terminate() {
@@ -103,15 +133,15 @@ class OCRService {
 
   /**
    * Check if OCR is currently processing
-   * @returns {boolean}
+   * @returns {boolean} True if processing, false otherwise
    */
   isOCRProcessing() {
     return this.isProcessing;
   }
 
   /**
-   * Get current language
-   * @returns {string}
+   * Get current language setting
+   * @returns {string} Current language code
    */
   getCurrentLanguage() {
     return this.language;

@@ -7,7 +7,15 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "start": "vite"
+    "start": "vite",
+    "lint": "biome lint ./src/**/*.js",
+    "lint:fix": "biome lint --write ./src/**/*.js",
+    "format": "biome format ./src/**/*.js",
+    "format:fix": "biome format --write ./src/**/*.js",
+    "check": "biome check ./src/**/*.js",
+    "check:fix": "biome check --write ./src/**/*.js",
+    "typecheck": "tsc --noEmit",
+    "validate": "npm run check && npm run typecheck"
   },
   "keywords": [
     "ocr",
@@ -23,9 +31,11 @@
     "tesseract.js": "^5.0.5"
   },
   "devDependencies": {
-    "vite": "^5.0.12",
+    "@biomejs/biome": "^2.3.5",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.33",
-    "tailwindcss": "^3.4.1"
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.9.3",
+    "vite": "^5.0.12"
   }
 }
