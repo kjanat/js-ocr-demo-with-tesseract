@@ -1,3 +1,8 @@
+import * as pdfjsLib from "https://cdn.jsdelivr.net/npm/pdfjs-dist@5/build/pdf.min.mjs";
+
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdn.jsdelivr.net/npm/pdfjs-dist@5/build/pdf.worker.min.mjs";
+
 var pdfDoc = null,
     pageNum = 1,
     pageRendering = false,
@@ -6,10 +11,6 @@ var pdfDoc = null,
 var tesseractWorker = null;
 
 async function showPDF(pdfData) {
-    var { pdfjsLib } = globalThis;
-
-    pdfjsLib.GlobalWorkerOptions.workerSrc =
-        "https://cdn.jsdelivr.net/npm/pdfjs-dist@5/build/pdf.worker.min.mjs";
 
     var loadingTask = pdfjsLib.getDocument(pdfData);
     loadingTask.promise.then(
